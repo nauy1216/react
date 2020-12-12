@@ -37,12 +37,12 @@ export type Interaction = {
 // Export all exports so that they're available in tests.
 // We can't use export * from in Flow for some reason.
 export {
-  Children,
-  createRef,
+  Children, // 封装的一些操作children的一些方法，
+  createRef, // 返回一个对象，对象的current属性指向使用ref的组件
   Component,
-  PureComponent,
+  PureComponent, // PureComponent继承了Component, 原型上多了isPureReactComponent=true标识
   createContext,
-  forwardRef,
+  forwardRef, // ref引用传递
   lazy,
   memo,
   useCallback,

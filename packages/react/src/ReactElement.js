@@ -345,6 +345,7 @@ export function jsxDEV(type, config, maybeKey, source, self) {
  * Create and return a new ReactElement of the given type.
  * See https://reactjs.org/docs/react-api.html#createelement
  */
+// 创建VNode元素
 export function createElement(type, config, children) {
   let propName;
 
@@ -356,6 +357,7 @@ export function createElement(type, config, children) {
   let self = null;
   let source = null;
 
+  // 属性
   if (config != null) {
     if (hasValidRef(config)) {
       ref = config.ref;
@@ -365,12 +367,14 @@ export function createElement(type, config, children) {
       }
     }
     if (hasValidKey(config)) {
+      // 转换成字符串
       key = '' + config.key;
     }
 
     self = config.__self === undefined ? null : config.__self;
     source = config.__source === undefined ? null : config.__source;
     // Remaining properties are added to a new props object
+    // 将config上的属性copy到props上
     for (propName in config) {
       if (
         hasOwnProperty.call(config, propName) &&
@@ -383,16 +387,19 @@ export function createElement(type, config, children) {
 
   // Children can be more than one argument, and those are transferred onto
   // the newly allocated props object.
-  const childrenLength = arguments.length - 2;
+  const childrenLength = arguments.length - 2; // 从第二个参数开始就是children
   if (childrenLength === 1) {
+    // 如果只有一个子元素
     props.children = children;
   } else if (childrenLength > 1) {
+    // 如果有多个
     const childArray = Array(childrenLength);
     for (let i = 0; i < childrenLength; i++) {
       childArray[i] = arguments[i + 2];
     }
     if (__DEV__) {
       if (Object.freeze) {
+        // 将childArray浅冻结, childArray元素本身是可以修改的
         Object.freeze(childArray);
       }
     }
@@ -400,6 +407,7 @@ export function createElement(type, config, children) {
   }
 
   // Resolve default props
+  // 设置属性的默认值, 至于当属性值为undefined时才会使用默认值
   if (type && type.defaultProps) {
     const defaultProps = type.defaultProps;
     for (propName in defaultProps) {

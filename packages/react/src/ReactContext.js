@@ -32,6 +32,9 @@ export function createContext<T>(
     }
   }
 
+  // Consumer其实就是context
+  // Provider的属性_context指向context
+  // 所以Consumer和Provider是相互引用的两个对象
   const context: ReactContext<T> = {
     $$typeof: REACT_CONTEXT_TYPE,
     _calculateChangedBits: calculateChangedBits,
