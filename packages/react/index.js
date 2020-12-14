@@ -54,6 +54,8 @@ export {
   useMemo,
   useReducer,
   useRef,
+  // 在函数式组件内使用state，让函数式组件能有自己的state
+  // const [name, setName] = useState("liuchengyuan")
   useState,
   useMutableSource,
   useMutableSource as unstable_useMutableSource,

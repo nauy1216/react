@@ -103,6 +103,8 @@ export {
   cloneElement,
   isValidElement,
   ReactVersion as version,
+  // 将一些运行时的全局变量暴露出去
+  // 比如：ReactCurrentDispatcher、ReactCurrentOwner
   ReactSharedInternals as __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED,
   // Deprecated behind disableCreateFactory
   createFactory,
