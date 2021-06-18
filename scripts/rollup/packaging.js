@@ -15,6 +15,9 @@ const {
   asyncRimRaf,
 } = require('./utils');
 
+// const prefix = 'build/node_modules'
+const prefix = 'playground/src/react-lib'
+
 const {
   NODE_ES2015,
   NODE_ESM,
@@ -45,17 +48,17 @@ function getPackageName(name) {
 function getBundleOutputPath(bundleType, filename, packageName) {
   switch (bundleType) {
     case NODE_ES2015:
-      return `build/node_modules/${packageName}/cjs/${filename}`;
+      return `${prefix}/${packageName}/cjs/${filename}`;
     case NODE_ESM:
-      return `build/node_modules/${packageName}/esm/${filename}`;
+      return `${prefix}/${packageName}/esm/${filename}`;
     case NODE_DEV:
     case NODE_PROD:
     case NODE_PROFILING:
-      return `build/node_modules/${packageName}/cjs/${filename}`;
+      return `${prefix}/${packageName}/cjs/${filename}`;
     case UMD_DEV:
     case UMD_PROD:
     case UMD_PROFILING:
-      return `build/node_modules/${packageName}/umd/${filename}`;
+      return `${prefix}/${packageName}/umd/${filename}`;
     case FB_WWW_DEV:
     case FB_WWW_PROD:
     case FB_WWW_PROFILING:
@@ -121,7 +124,7 @@ function getTarOptions(tgzName, packageName) {
   const CONTENTS_FOLDER = 'package';
   return {
     src: tgzName,
-    dest: `build/node_modules/${packageName}`,
+    dest: `${prefix}/${packageName}`,
     tar: {
       entries: [CONTENTS_FOLDER],
       map(header) {
@@ -144,7 +147,7 @@ for (const bundle of Bundles.bundles) {
 
 function filterOutEntrypoints(name) {
   // Remove entry point files that are not built in this configuration.
-  let jsonPath = `build/node_modules/${name}/package.json`;
+  let jsonPath = `${prefix}/${name}/package.json`;
   let packageJSON = JSON.parse(readFileSync(jsonPath));
   let files = packageJSON.files;
   if (!Array.isArray(files)) {
@@ -173,7 +176,7 @@ function filterOutEntrypoints(name) {
       // Let's remove it.
       files.splice(i, 1);
       i--;
-      unlinkSync(`build/node_modules/${name}/${filename}`);
+      unlinkSync(`${prefix}/${name}/${filename}`);
       changed = true;
     }
   }
@@ -185,32 +188,32 @@ function filterOutEntrypoints(name) {
 
 async function prepareNpmPackage(name) {
   await Promise.all([
-    asyncCopyTo('LICENSE', `build/node_modules/${name}/LICENSE`),
+    asyncCopyTo('LICENSE', `${prefix}/${name}/LICENSE`),
     asyncCopyTo(
       `packages/${name}/package.json`,
-      `build/node_modules/${name}/package.json`
+      `${prefix}/${name}/package.json`
     ),
     asyncCopyTo(
       `packages/${name}/README.md`,
-      `build/node_modules/${name}/README.md`
+      `${prefix}/${name}/README.md`
     ),
-    asyncCopyTo(`packages/${name}/npm`, `build/node_modules/${name}`),
+    asyncCopyTo(`packages/${name}/npm`, `${prefix}/${name}`),
   ]);
   filterOutEntrypoints(name);
   const tgzName = (
-    await asyncExecuteCommand(`npm pack build/node_modules/${name}`)
+    await asyncExecuteCommand(`npm pack ${prefix}/${name}`)
   ).trim();
-  await asyncRimRaf(`build/node_modules/${name}`);
+  await asyncRimRaf(`${prefix}/${name}`);
   await asyncExtractTar(getTarOptions(tgzName, name));
   unlinkSync(tgzName);
 }
 
 async function prepareNpmPackages() {
-  if (!existsSync('build/node_modules')) {
+  if (!existsSync('${prefix}')) {
     // We didn't build any npm packages.
     return;
   }
-  const builtPackageFolders = readdirSync('build/node_modules').filter(
+  const builtPackageFolders = readdirSync('${prefix}').filter(
     dir => dir.charAt(0) !== '.'
   );
   await Promise.all(builtPackageFolders.map(prepareNpmPackage));
