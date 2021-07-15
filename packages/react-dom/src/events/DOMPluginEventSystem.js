@@ -383,6 +383,7 @@ const listeningMarker =
 
 export function listenToAllSupportedEvents(rootContainerElement: EventTarget) {
   if (!(rootContainerElement: any)[listeningMarker]) {
+    // 添加一个标识， 表示已经进行事件监听
     (rootContainerElement: any)[listeningMarker] = true;
     allNativeEvents.forEach(domEventName => {
       // We handle selectionchange separately because it
@@ -394,6 +395,7 @@ export function listenToAllSupportedEvents(rootContainerElement: EventTarget) {
         listenToNativeEvent(domEventName, true, rootContainerElement);
       }
     });
+    // 对selectionchange事件进行单独处理
     const ownerDocument =
       (rootContainerElement: any).nodeType === DOCUMENT_NODE
         ? rootContainerElement
@@ -538,6 +540,9 @@ export function dispatchEventForPluginEventSystem(
   targetInst: null | Fiber,
   targetContainer: EventTarget,
 ): void {
+  if (window.react_event) {
+    debugger
+  }
   let ancestorInst = targetInst;
   if (
     (eventSystemFlags & IS_EVENT_HANDLE_NON_MANAGED_NODE) === 0 &&

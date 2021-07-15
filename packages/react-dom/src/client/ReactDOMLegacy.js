@@ -117,6 +117,7 @@ function legacyCreateRootFromDOMContainer(
   const shouldHydrate =
     forceHydrate || shouldHydrateDueToLegacyHeuristic(container);
   // First clear any existing content.
+  // 不是服务端渲染，第一次渲染先把dom容器内的所有子dom元素删除
   if (!shouldHydrate) {
     let warned = false;
     let rootSibling;
@@ -179,6 +180,7 @@ function legacyRenderSubtreeIntoContainer(
   forceHydrate: boolean,
   callback: ?Function,
 ) {
+  debugger
   if (__DEV__) {
     topLevelUpdateWarnings(container);
     warnOnInvalidCallback(callback === undefined ? null : callback, 'render');
@@ -190,6 +192,7 @@ function legacyRenderSubtreeIntoContainer(
   let fiberRoot;
   if (!root) {
     // Initial mount
+    // 第一次mount
     root = container._reactRootContainer = legacyCreateRootFromDOMContainer(
       container,
       forceHydrate,
@@ -203,7 +206,9 @@ function legacyRenderSubtreeIntoContainer(
       };
     }
     // Initial mount should not be batched.
+    // 初始化 mount 不做批量更新
     unbatchedUpdates(() => {
+      // 在对container、FiberRootNode准备好对根fiber节点进行渲染
       updateContainer(children, fiberRoot, parentComponent, callback);
     });
   } else {
@@ -284,6 +289,13 @@ export function hydrate(
   );
 }
 
+/**
+ * 
+ * @param {*} element jsx对象
+ * @param {*} container dom父节点
+ * @param {*} callback 渲染之后的回调
+ * @returns 
+ */
 export function render(
   element: React$Element<any>,
   container: Container,
@@ -305,6 +317,7 @@ export function render(
       );
     }
   }
+  debugger
   return legacyRenderSubtreeIntoContainer(
     null,
     element,

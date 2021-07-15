@@ -166,6 +166,7 @@ export function cancelCallback(callbackNode: mixed) {
 }
 
 export function flushSyncCallbackQueue() {
+  debugger
   if (immediateQueueCallbackNode !== null) {
     const node = immediateQueueCallbackNode;
     immediateQueueCallbackNode = null;

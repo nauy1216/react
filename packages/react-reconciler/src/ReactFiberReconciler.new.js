@@ -257,6 +257,8 @@ export function updateContainer(
     onScheduleRoot(container, element);
   }
   const current = container.current;
+  // 获取一个时间
+  // 是做什么用的
   const eventTime = requestEventTime();
   if (__DEV__) {
     // $FlowExpectedError - jest isn't a global, and isn't recognized outside of tests
@@ -265,12 +267,14 @@ export function updateContainer(
       warnIfNotScopedWithMatchingAct(current);
     }
   }
+  // 获取优先级
   const lane = requestUpdateLane(current);
 
   if (enableSchedulingProfiler) {
     markRenderScheduled(lane);
   }
 
+  // 通过subtree获得context
   const context = getContextForSubtree(parentComponent);
   if (container.context === null) {
     container.context = context;
@@ -295,9 +299,11 @@ export function updateContainer(
     }
   }
 
+  // 创建一个update对象
   const update = createUpdate(eventTime, lane);
   // Caution: React DevTools currently depends on this property
   // being called "element".
+  // element是跟节点App
   update.payload = {element};
 
   callback = callback === undefined ? null : callback;

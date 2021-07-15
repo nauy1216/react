@@ -334,8 +334,8 @@ module.exports = function (webpackEnv) {
           'scheduler/tracing': 'scheduler/tracing-profiling',
         }),
         ...{
-          'react$': path.resolve(__dirname, '../src/react-lib/react/index.js'),
-          'react-dom$': path.resolve(__dirname, '../src/react-lib/react-dom/index.js'),
+          'react$': path.resolve(__dirname, '../src/react-lib/react/cjs/react.development.js'),
+          'react-dom$': path.resolve(__dirname, '../src/react-lib/react-dom/cjs/react-dom.development.js'),
         },
         ...(modules.webpackAliases || {}),
       },

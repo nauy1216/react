@@ -129,10 +129,13 @@ function createRootImpl(
       options.hydrationOptions.mutableSources) ||
     null;
   const root = createContainer(container, tag, hydrate, hydrationCallbacks);
+  // 在DOM元素上添加__reactContainer$属性， 用来标记这是container元素
   markContainerAsRoot(root.current, container);
 
   const rootContainerElement =
     container.nodeType === COMMENT_NODE ? container.parentNode : container;
+
+    // 在根节点上进行事件代理
   listenToAllSupportedEvents(rootContainerElement);
 
   if (mutableSources) {

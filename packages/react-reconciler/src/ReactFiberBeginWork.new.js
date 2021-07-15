@@ -230,12 +230,18 @@ if (__DEV__) {
   didWarnAboutDefaultPropsOnFunctionComponent = {};
 }
 
+/*
+从该函数名就能看出这是Reconciler模块的核心部分。那么他究竟做了什么呢？
+1、对于mount的组件，他会创建新的子Fiber节点
+2、对于update的组件，他会将当前组件与该组件在上次更新时对应的Fiber节点比较（也就是俗称的Diff算法），将比较的结果生成新Fiber节点
+*/
 export function reconcileChildren(
   current: Fiber | null,
   workInProgress: Fiber,
   nextChildren: any,
   renderLanes: Lanes,
 ) {
+  // mount
   if (current === null) {
     // If this is a fresh new component that hasn't been rendered yet, we
     // won't update its child set by applying minimal side-effects. Instead,
@@ -247,6 +253,8 @@ export function reconcileChildren(
       nextChildren,
       renderLanes,
     );
+  
+  // update
   } else {
     // If the current child is the same as the work in progress, it means that
     // we haven't yet started any work on these children. Therefore, we use
@@ -1297,6 +1305,7 @@ function mountIndeterminateComponent(
   let value;
 
   if (__DEV__) {
+    // class component 组件
     if (
       Component.prototype &&
       typeof Component.prototype.render === 'function'
@@ -1314,11 +1323,14 @@ function mountIndeterminateComponent(
       }
     }
 
+    // 严格模式
     if (workInProgress.mode & StrictMode) {
       ReactStrictModeWarnings.recordLegacyContextWarning(workInProgress, null);
     }
 
+    // 设置全局变量isRendering
     setIsRendering(true);
+    // 设置ReactCurrentOwner.current
     ReactCurrentOwner.current = workInProgress;
     value = renderWithHooks(
       null,
@@ -3026,6 +3038,7 @@ function beginWork(
   workInProgress: Fiber,
   renderLanes: Lanes,
 ): Fiber | null {
+  debugger
   const updateLanes = workInProgress.lanes;
 
   if (__DEV__) {
@@ -3046,6 +3059,7 @@ function beginWork(
     }
   }
 
+  // current存在则表示是update
   if (current !== null) {
     const oldProps = current.memoizedProps;
     const newProps = workInProgress.pendingProps;
@@ -3259,6 +3273,7 @@ function beginWork(
   // move this assignment out of the common path and into each branch.
   workInProgress.lanes = NoLanes;
 
+  // mountd
   switch (workInProgress.tag) {
     case IndeterminateComponent: {
       return mountIndeterminateComponent(

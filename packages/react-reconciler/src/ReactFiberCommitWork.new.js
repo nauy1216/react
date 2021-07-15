@@ -848,6 +848,7 @@ function hideOrUnhideAllChildren(finishedWork, isHidden) {
 }
 
 function commitAttachRef(finishedWork: Fiber) {
+  debugger
   const ref = finishedWork.ref;
   if (ref !== null) {
     const instance = finishedWork.stateNode;

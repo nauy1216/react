@@ -253,10 +253,14 @@ export function updateContainer(
   parentComponent: ?React$Component<any, any>,
   callback: ?Function,
 ): Lane {
+  debugger
   if (__DEV__) {
     onScheduleRoot(container, element);
   }
+  // container 是FiberRootNode
+  // container.current 是一个FiberNode对象
   const current = container.current;
+  // 获取一个时间， 做什么用？
   const eventTime = requestEventTime();
   if (__DEV__) {
     // $FlowExpectedError - jest isn't a global, and isn't recognized outside of tests
@@ -265,12 +269,14 @@ export function updateContainer(
       warnIfNotScopedWithMatchingAct(current);
     }
   }
+  // 优先级
   const lane = requestUpdateLane(current);
 
   if (enableSchedulingProfiler) {
     markRenderScheduled(lane);
   }
 
+  // context是做什么用的？
   const context = getContextForSubtree(parentComponent);
   if (container.context === null) {
     container.context = context;
@@ -294,10 +300,11 @@ export function updateContainer(
       );
     }
   }
-
+  // 创建一个update对象
   const update = createUpdate(eventTime, lane);
   // Caution: React DevTools currently depends on this property
   // being called "element".
+  // element是 App组件
   update.payload = {element};
 
   callback = callback === undefined ? null : callback;

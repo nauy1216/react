@@ -989,9 +989,14 @@ function updateHostRoot(current, workInProgress, renderLanes) {
       'bailed out. This error is likely caused by a bug in React. Please ' +
       'file an issue.',
   );
+  // pendingProps上保存了新的props
   const nextProps = workInProgress.pendingProps;
+  // memoizedState上保存了旧的props
   const prevState = workInProgress.memoizedState;
+  // prevState.element保存了children
   const prevChildren = prevState !== null ? prevState.element : null;
+  // 如果current和workInProgress的updateQueue是同一个对象
+  // 那么将会clone一个新的对象作为workInProgress的updateQueue
   cloneUpdateQueue(current, workInProgress);
   processUpdateQueue(workInProgress, nextProps, null, renderLanes);
   const nextState = workInProgress.memoizedState;
@@ -3260,6 +3265,7 @@ function beginWork(
   workInProgress.lanes = NoLanes;
 
   switch (workInProgress.tag) {
+    // Indeterminate: 不确定的
     case IndeterminateComponent: {
       return mountIndeterminateComponent(
         current,

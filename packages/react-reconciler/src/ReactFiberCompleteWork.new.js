@@ -211,6 +211,7 @@ if (supportsMutation) {
   updateHostContainer = function(workInProgress: Fiber) {
     // Noop
   };
+  // 更新dom元素
   updateHostComponent = function(
     current: Fiber,
     workInProgress: Fiber,
@@ -245,6 +246,7 @@ if (supportsMutation) {
       currentHostContext,
     );
     // TODO: Type this specific to this type of component.
+    // updatePayload为数组形式，他的偶数索引的值为变化的prop key，奇数索引的值为变化的prop value。
     workInProgress.updateQueue = (updatePayload: any);
     // If the update payload indicates that there is a change or if there
     // is a new ref we mark this as an update. All the work is done in commitWork.

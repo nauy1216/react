@@ -997,6 +997,7 @@ function markRootSuspended(root, suspendedLanes) {
 // This is the entry point for synchronous tasks that don't go
 // through Scheduler
 function performSyncWorkOnRoot(root) {
+  debugger
   if (enableProfilerTimer && enableProfilerNestedUpdatePhase) {
     syncNestedUpdateFlag();
   }
@@ -1153,6 +1154,7 @@ function flushPendingDiscreteUpdates() {
 }
 
 export function batchedUpdates<A, R>(fn: A => R, a: A): R {
+  debugger
   const prevExecutionContext = executionContext;
   executionContext |= BatchedContext;
   try {
@@ -1227,6 +1229,7 @@ export function discreteUpdates<A, B, C, D, R>(
 }
 
 export function unbatchedUpdates<A, R>(fn: (a: A) => R, a: A): R {
+  debugger
   const prevExecutionContext = executionContext;
   executionContext &= ~BatchedContext;
   executionContext |= LegacyUnbatchedContext;
@@ -1526,6 +1529,7 @@ export function renderHasNotSuspendedYet(): boolean {
 }
 
 function renderRootSync(root: FiberRoot, lanes: Lanes) {
+  debugger
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
   const prevDispatcher = pushDispatcher();
@@ -1681,6 +1685,7 @@ function performUnitOfWork(unitOfWork: Fiber): void {
   // The current, flushed, state of this fiber is the alternate. Ideally
   // nothing should rely on this, but relying on it here means that we don't
   // need an additional field on the work in progress.
+  // 
   const current = unitOfWork.alternate;
   setCurrentDebugFiberInDEV(unitOfWork);
 
@@ -1840,6 +1845,7 @@ function completeUnitOfWork(unitOfWork: Fiber): void {
 }
 
 function commitRoot(root) {
+  debugger
   const renderPriorityLevel = getCurrentPriorityLevel();
   runWithPriority(
     ImmediateSchedulerPriority,
@@ -1849,6 +1855,7 @@ function commitRoot(root) {
 }
 
 function commitRootImpl(root, renderPriorityLevel) {
+  debugger
   do {
     // `flushPassiveEffects` will call `flushSyncUpdateQueue` at the end, which
     // means `flushPassiveEffects` will sometimes result in additional
@@ -2047,6 +2054,8 @@ function commitRootImpl(root, renderPriorityLevel) {
     // the mutation phase, so that the previous tree is still current during
     // componentWillUnmount, but before the layout phase, so that the finished
     // work is current during componentDidMount/Update.
+    // current Fiber树切换
+    // workInProgress Fiber树在commit阶段完成渲染后会变为current Fiber树。
     root.current = finishedWork;
 
     // The next phase is the layout phase, where we call effects that read
@@ -2277,6 +2286,7 @@ function commitBeforeMutationEffects() {
 }
 
 function commitMutationEffects(root: FiberRoot, renderPriorityLevel) {
+  debugger
   // TODO: Should probably move the bulk of this function to commitWork.
   while (nextEffect !== null) {
     setCurrentDebugFiberInDEV(nextEffect);

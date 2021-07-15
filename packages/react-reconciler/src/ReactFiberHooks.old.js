@@ -333,6 +333,7 @@ function areHookInputsEqual(
   return true;
 }
 
+// 函数式组件
 export function renderWithHooks<Props, SecondArg>(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -392,6 +393,7 @@ export function renderWithHooks<Props, SecondArg>(
         : HooksDispatcherOnUpdate;
   }
 
+  // 执行函数组件得到children
   let children = Component(props, secondArg);
 
   // Check if there was a render phase update
@@ -1804,6 +1806,8 @@ function dispatchAction<S, A>(
   };
 
   // Append the update to the end of the list.
+  // pending用来保存将要进行更新的状态
+  // 当前进行多次同步更新后会形成一个环形链表
   const pending = queue.pending;
   if (pending === null) {
     // This is the first update. Create a circular list.
@@ -1870,6 +1874,7 @@ function dispatchAction<S, A>(
         warnIfNotCurrentlyActingUpdatesInDev(fiber);
       }
     }
+    // 对当前fiber进行调度更新
     scheduleUpdateOnFiber(fiber, lane, eventTime);
   }
 

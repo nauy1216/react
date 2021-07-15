@@ -325,6 +325,7 @@ function areHookInputsEqual(
   return true;
 }
 
+// hooks 组件
 export function renderWithHooks<Props, SecondArg>(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -364,6 +365,7 @@ export function renderWithHooks<Props, SecondArg>(
   // Using memoizedState to differentiate between mount/update only works if at least one stateful hook is used.
   // Non-stateful hooks (e.g. context) don't get added to memoizedState,
   // so memoizedState would be null during updates and mounts.
+  // 1. 设置ReactCurrentDispatcher
   if (__DEV__) {
     if (current !== null && current.memoizedState !== null) {
       ReactCurrentDispatcher.current = HooksDispatcherOnUpdateInDEV;
@@ -384,6 +386,7 @@ export function renderWithHooks<Props, SecondArg>(
         : HooksDispatcherOnUpdate;
   }
 
+  // 2. 执行组件函数， 第一个参数是props, 第二个参数可能是ref
   let children = Component(props, secondArg);
 
   // Check if there was a render phase update
@@ -514,6 +517,7 @@ export function resetHooksAfterThrow(): void {
   didScheduleRenderPhaseUpdateDuringThisPass = false;
 }
 
+// workInProgress mount时执行hook
 function mountWorkInProgressHook(): Hook {
   const hook: Hook = {
     memoizedState: null,
@@ -525,8 +529,11 @@ function mountWorkInProgressHook(): Hook {
     next: null,
   };
 
+  // workInProgressHooks是一个全局变量
+  // 用来存储 workInProgress 的链表起始位置
   if (workInProgressHook === null) {
     // This is the first hook in the list
+    // memoizedState也是一个链表用来存储函数式组件的状态
     currentlyRenderingFiber.memoizedState = workInProgressHook = hook;
   } else {
     // Append to the end of the list
@@ -1844,6 +1851,7 @@ if (enableCache) {
   (ContextOnlyDispatcher: Dispatcher).getCacheForType = getCacheForType;
 }
 
+// onMount时执行hook
 const HooksDispatcherOnMount: Dispatcher = {
   readContext,
 

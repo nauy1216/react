@@ -8,7 +8,7 @@
  */
 
 'use strict';
-debugger
+
 if (process.env.NODE_ENV !== "production") {
   (function() {
 'use strict';

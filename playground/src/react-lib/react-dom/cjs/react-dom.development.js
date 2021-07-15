@@ -8615,6 +8615,7 @@ function listenToNativeEvent(domEventName, isCapturePhaseListener, target) {
 var listeningMarker = '_reactListening' + Math.random().toString(36).slice(2);
 function listenToAllSupportedEvents(rootContainerElement) {
   if (!rootContainerElement[listeningMarker]) {
+    // 添加一个标识， 表示已经进行事件监听
     rootContainerElement[listeningMarker] = true;
     allNativeEvents.forEach(function (domEventName) {
       // We handle selectionchange separately because it
@@ -8626,7 +8627,8 @@ function listenToAllSupportedEvents(rootContainerElement) {
 
         listenToNativeEvent(domEventName, true, rootContainerElement);
       }
-    });
+    }); // 对selectionchange事件进行单独处理
+
     var ownerDocument = rootContainerElement.nodeType === DOCUMENT_NODE ? rootContainerElement : rootContainerElement.ownerDocument;
 
     if (ownerDocument !== null) {
@@ -8682,6 +8684,10 @@ function isMatchingRootContainer(grandContainer, targetContainer) {
 }
 
 function dispatchEventForPluginEventSystem(domEventName, eventSystemFlags, nativeEvent, targetInst, targetContainer) {
+  if (window.react_event) {
+    debugger;
+  }
+
   var ancestorInst = targetInst;
 
   if ((eventSystemFlags & IS_EVENT_HANDLE_NON_MANAGED_NODE) === 0 && (eventSystemFlags & IS_NON_DELEGATED) === 0) {
@@ -9198,7 +9204,8 @@ function setInitialDOMProperties(tag, domElement, rootContainerElement, nextProp
 }
 
 function updateDOMProperties(domElement, updatePayload, wasCustomComponentTag, isCustomComponentTag) {
-  // TODO: Handle wasCustomComponentTag
+  debugger; // TODO: Handle wasCustomComponentTag
+
   for (var i = 0; i < updatePayload.length; i += 2) {
     var propKey = updatePayload[i];
     var propValue = updatePayload[i + 1];
@@ -14451,14 +14458,17 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
 
       child = child.sibling;
-    }
+    } // 通过fragment element 创建fiber
+
 
     if (element.type === REACT_FRAGMENT_TYPE) {
       var created = createFiberFromFragment(element.props.children, returnFiber.mode, lanes, element.key);
       created.return = returnFiber;
       return created;
     } else {
-      var _created4 = createFiberFromElement(element, returnFiber.mode, lanes);
+      // 通过 element 创建fiber
+      var _created4 = createFiberFromElement(element, returnFiber.mode, lanes); // 设置ref
+
 
       _created4.ref = coerceRef(returnFiber, currentFirstChild, element);
       _created4.return = returnFiber;
@@ -15417,7 +15427,8 @@ function areHookInputsEqual(nextDeps, prevDeps) {
   }
 
   return true;
-}
+} // 函数式组件
+
 
 function renderWithHooks(current, workInProgress, Component, props, secondArg, nextRenderLanes) {
   renderLanes = nextRenderLanes;
@@ -15456,7 +15467,8 @@ function renderWithHooks(current, workInProgress, Component, props, secondArg, n
     } else {
       ReactCurrentDispatcher$1.current = HooksDispatcherOnMountInDEV;
     }
-  }
+  } // 执行函数组件得到children
+
 
   var children = Component(props, secondArg); // Check if there was a render phase update
 
@@ -16556,6 +16568,8 @@ function dispatchAction(fiber, queue, action) {
     eagerState: null,
     next: null
   }; // Append the update to the end of the list.
+  // pending用来保存将要进行更新的状态
+  // 当前进行多次同步更新后会形成一个环形链表
 
   var pending = queue.pending;
 
@@ -16622,7 +16636,8 @@ function dispatchAction(fiber, queue, action) {
         warnIfNotScopedWithMatchingAct(fiber);
         warnIfNotCurrentlyActingUpdatesInDev(fiber);
       }
-    }
+    } // 对当前fiber进行调度更新
+
 
     scheduleUpdateOnFiber(fiber, lane, eventTime);
   }
@@ -18082,11 +18097,16 @@ function updateHostRoot(current, workInProgress, renderLanes) {
     {
       throw Error( "If the root does not have an updateQueue, we should have already bailed out. This error is likely caused by a bug in React. Please file an issue." );
     }
-  }
+  } // pendingProps上保存了新的props
 
-  var nextProps = workInProgress.pendingProps;
-  var prevState = workInProgress.memoizedState;
-  var prevChildren = prevState !== null ? prevState.element : null;
+
+  var nextProps = workInProgress.pendingProps; // memoizedState上保存了旧的props
+
+  var prevState = workInProgress.memoizedState; // prevState.element保存了children
+
+  var prevChildren = prevState !== null ? prevState.element : null; // 如果current和workInProgress的updateQueue是同一个对象
+  // 那么将会clone一个新的对象作为workInProgress的updateQueue
+
   cloneUpdateQueue(current, workInProgress);
   processUpdateQueue(workInProgress, nextProps, null, renderLanes);
   var nextState = workInProgress.memoizedState; // Caution: React DevTools currently depends on this property
@@ -19825,6 +19845,7 @@ function beginWork(current, workInProgress, renderLanes) {
   workInProgress.lanes = NoLanes;
 
   switch (workInProgress.tag) {
+    // Indeterminate: 不确定的
     case IndeterminateComponent:
       {
         return mountIndeterminateComponent(current, workInProgress, workInProgress.type, renderLanes);
@@ -22846,6 +22867,7 @@ function requestRetryLane(fiber) {
 }
 
 function scheduleUpdateOnFiber(fiber, lane, eventTime) {
+  debugger;
   checkForNestedUpdates();
   warnAboutRenderPhaseUpdatesInDEV(fiber);
   var root = markUpdateLaneFromFiberToRoot(fiber, lane);
@@ -23399,9 +23421,11 @@ function flushPendingDiscreteUpdates() {
 
 
   flushSyncCallbackQueue();
-}
+} // 导出为 unstable_batchedUpdates
+
 
 function batchedUpdates$1(fn, a) {
+  debugger;
   var prevExecutionContext = executionContext;
   executionContext |= BatchedContext;
 
@@ -23700,6 +23724,7 @@ function renderHasNotSuspendedYet() {
 }
 
 function renderRootSync(root, lanes) {
+  debugger;
   var prevExecutionContext = executionContext;
   executionContext |= RenderContext;
   var prevDispatcher = pushDispatcher(); // If the root or lanes have changed, throw out the existing stack
@@ -23843,11 +23868,12 @@ function performUnitOfWork(unitOfWork) {
     next = beginWork$1(current, unitOfWork, subtreeRenderLanes);
     stopProfilerTimerIfRunningAndRecordDelta(unitOfWork, true);
   } else {
+    // 生成链表的下一个fiber节点
     next = beginWork$1(current, unitOfWork, subtreeRenderLanes);
   }
 
   resetCurrentFiber();
-  unitOfWork.memoizedProps = unitOfWork.pendingProps;
+  unitOfWork.memoizedProps = unitOfWork.pendingProps; // 如果next为null, 则表示当前work已经完成了，调用completeUnitOfWork
 
   if (next === null) {
     // If this doesn't spawn new work, complete the current work.
@@ -23860,8 +23886,9 @@ function performUnitOfWork(unitOfWork) {
 }
 
 function completeUnitOfWork(unitOfWork) {
-  // Attempt to complete the current unit of work, then move to the next
+  debugger; // Attempt to complete the current unit of work, then move to the next
   // sibling. If there are no more siblings, return to the parent fiber.
+
   var completedWork = unitOfWork;
 
   do {
@@ -23991,6 +24018,7 @@ function completeUnitOfWork(unitOfWork) {
 }
 
 function commitRoot(root) {
+  debugger;
   var renderPriorityLevel = getCurrentPriorityLevel();
   runWithPriority(ImmediatePriority, commitRootImpl.bind(null, root, renderPriorityLevel));
   return null;
@@ -24315,6 +24343,8 @@ function commitRootImpl(root, renderPriorityLevel) {
 }
 
 function commitBeforeMutationEffects() {
+  debugger;
+
   while (nextEffect !== null) {
     var current = nextEffect.alternate;
 
@@ -24357,6 +24387,8 @@ function commitBeforeMutationEffects() {
 
 function commitMutationEffects(root, renderPriorityLevel) {
   // TODO: Should probably move the bulk of this function to commitWork.
+  debugger;
+
   while (nextEffect !== null) {
     setCurrentFiber(nextEffect);
     var flags = nextEffect.flags;
@@ -24469,6 +24501,7 @@ function commitMutationEffects(root, renderPriorityLevel) {
 }
 
 function commitLayoutEffects(root, committedLanes) {
+  debugger;
 
   {
     markLayoutEffectsStarted(committedLanes);
@@ -25032,6 +25065,7 @@ var beginWork$1;
     // error See ReactErrorUtils for more information.
     // Before entering the begin phase, copy the work-in-progress onto a dummy
     // fiber. If beginWork throws, we'll use this to reset the state.
+    // 复制一份fiber, 用于还原
     var originalWorkInProgressCopy = assignFiberPropertiesInDEV(dummyFiber, unitOfWork);
 
     try {
@@ -26541,11 +26575,16 @@ function createContainer(containerInfo, tag, hydrate, hydrationCallbacks) {
   return createFiberRoot(containerInfo, tag, hydrate);
 }
 function updateContainer(element, container, parentComponent, callback) {
+  debugger;
+
   {
     onScheduleRoot(container, element);
-  }
+  } // container 是FiberRootNode
+  // container.current 是一个FiberNode对象
 
-  var current$1 = container.current;
+
+  var current$1 = container.current; // 获取一个时间， 做什么用？
+
   var eventTime = requestEventTime();
 
   {
@@ -26554,13 +26593,15 @@ function updateContainer(element, container, parentComponent, callback) {
       warnIfUnmockedScheduler(current$1);
       warnIfNotScopedWithMatchingAct(current$1);
     }
-  }
+  } // 优先级
+
 
   var lane = requestUpdateLane(current$1);
 
   {
     markRenderScheduled(lane);
-  }
+  } // context是做什么用的？
+
 
   var context = getContextForSubtree(parentComponent);
 
@@ -26576,10 +26617,12 @@ function updateContainer(element, container, parentComponent, callback) {
 
       error('Render methods should be a pure function of props and state; ' + 'triggering nested component updates from render is not allowed. ' + 'If necessary, trigger nested updates in componentDidUpdate.\n\n' + 'Check the render method of %s.', getComponentName(current.type) || 'Unknown');
     }
-  }
+  } // 创建一个update对象
+
 
   var update = createUpdate(eventTime, lane); // Caution: React DevTools currently depends on this property
   // being called "element".
+  // element是 App组件
 
   update.payload = {
     element: element
@@ -27024,9 +27067,11 @@ function createRootImpl(container, tag, options) {
   var hydrate = options != null && options.hydrate === true;
   var hydrationCallbacks = options != null && options.hydrationOptions || null;
   var mutableSources = options != null && options.hydrationOptions != null && options.hydrationOptions.mutableSources || null;
-  var root = createContainer(container, tag, hydrate);
+  var root = createContainer(container, tag, hydrate); // 在DOM元素上添加__reactContainer$属性， 用来标记这是container元素
+
   markContainerAsRoot(root.current, container);
-  var rootContainerElement = container.nodeType === COMMENT_NODE ? container.parentNode : container;
+  var rootContainerElement = container.nodeType === COMMENT_NODE ? container.parentNode : container; // 在根节点上进行事件代理
+
   listenToAllSupportedEvents(rootContainerElement);
 
   if (mutableSources) {
@@ -27131,6 +27176,7 @@ function shouldHydrateDueToLegacyHeuristic(container) {
 
 function legacyCreateRootFromDOMContainer(container, forceHydrate) {
   var shouldHydrate = forceHydrate || shouldHydrateDueToLegacyHeuristic(container); // First clear any existing content.
+  // 不是服务端渲染，第一次渲染先把dom容器内的所有子dom元素删除
 
   if (!shouldHydrate) {
     var warned = false;
@@ -27171,6 +27217,8 @@ function warnOnInvalidCallback$1(callback, callerName) {
 }
 
 function legacyRenderSubtreeIntoContainer(parentComponent, children, container, forceHydrate, callback) {
+  debugger;
+
   {
     topLevelUpdateWarnings(container);
     warnOnInvalidCallback$1(callback === undefined ? null : callback, 'render');
@@ -27183,6 +27231,7 @@ function legacyRenderSubtreeIntoContainer(parentComponent, children, container, 
 
   if (!root) {
     // Initial mount
+    // 第一次mount
     root = container._reactRootContainer = legacyCreateRootFromDOMContainer(container, forceHydrate);
     fiberRoot = root._internalRoot;
 
@@ -27194,9 +27243,11 @@ function legacyRenderSubtreeIntoContainer(parentComponent, children, container, 
         originalCallback.call(instance);
       };
     } // Initial mount should not be batched.
+    // 初始化 mount 不做批量更新
 
 
     unbatchedUpdates(function () {
+      // 在对container、FiberRootNode准备好对根fiber节点进行渲染
       updateContainer(children, fiberRoot, parentComponent, callback);
     });
   } else {
@@ -27264,6 +27315,14 @@ function hydrate(element, container, callback) {
 
   return legacyRenderSubtreeIntoContainer(null, element, container, true, callback);
 }
+/**
+ * 
+ * @param {*} element jsx对象
+ * @param {*} container dom父节点
+ * @param {*} callback 渲染之后的回调
+ * @returns 
+ */
+
 function render(element, container, callback) {
   if (!isValidContainer(container)) {
     {
@@ -27279,6 +27338,7 @@ function render(element, container, callback) {
     }
   }
 
+  debugger;
   return legacyRenderSubtreeIntoContainer(null, element, container, false, callback);
 }
 function unstable_renderSubtreeIntoContainer(parentComponent, element, containerNode, callback) {

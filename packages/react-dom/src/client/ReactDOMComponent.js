@@ -338,6 +338,7 @@ function updateDOMProperties(
   wasCustomComponentTag: boolean,
   isCustomComponentTag: boolean,
 ): void {
+  debugger
   // TODO: Handle wasCustomComponentTag
   for (let i = 0; i < updatePayload.length; i += 2) {
     const propKey = updatePayload[i];

@@ -6121,14 +6121,17 @@
         }
 
         child = child.sibling;
-      }
+      } // 通过fragment element 创建fiber
+
 
       if (element.type === REACT_FRAGMENT_TYPE) {
         var created = createFiberFromFragment(element.props.children, returnFiber.mode, lanes, element.key);
         created.return = returnFiber;
         return created;
       } else {
-        var _created4 = createFiberFromElement(element, returnFiber.mode, lanes);
+        // 通过 element 创建fiber
+        var _created4 = createFiberFromElement(element, returnFiber.mode, lanes); // 设置ref
+
 
         _created4.ref = coerceRef(returnFiber, currentFirstChild, element);
         _created4.return = returnFiber;
@@ -6762,7 +6765,8 @@
     }
 
     return true;
-  }
+  } // 函数式组件
+
 
   function renderWithHooks(current, workInProgress, Component, props, secondArg, nextRenderLanes) {
     renderLanes = nextRenderLanes;
@@ -6801,7 +6805,8 @@
       } else {
         ReactCurrentDispatcher$1.current = HooksDispatcherOnMountInDEV;
       }
-    }
+    } // 执行函数组件得到children
+
 
     var children = Component(props, secondArg); // Check if there was a render phase update
 
@@ -7849,6 +7854,8 @@
       eagerState: null,
       next: null
     }; // Append the update to the end of the list.
+    // pending用来保存将要进行更新的状态
+    // 当前进行多次同步更新后会形成一个环形链表
 
     var pending = queue.pending;
 
@@ -7908,6 +7915,7 @@
           }
         }
       }
+
 
       scheduleUpdateOnFiber(fiber, lane, eventTime);
     }
@@ -9367,11 +9375,16 @@
       {
         throw Error( "If the root does not have an updateQueue, we should have already bailed out. This error is likely caused by a bug in React. Please file an issue." );
       }
-    }
+    } // pendingProps上保存了新的props
 
-    var nextProps = workInProgress.pendingProps;
-    var prevState = workInProgress.memoizedState;
-    var prevChildren = prevState !== null ? prevState.element : null;
+
+    var nextProps = workInProgress.pendingProps; // memoizedState上保存了旧的props
+
+    var prevState = workInProgress.memoizedState; // prevState.element保存了children
+
+    var prevChildren = prevState !== null ? prevState.element : null; // 如果current和workInProgress的updateQueue是同一个对象
+    // 那么将会clone一个新的对象作为workInProgress的updateQueue
+
     cloneUpdateQueue(current, workInProgress);
     processUpdateQueue(workInProgress, nextProps, null, renderLanes);
     var nextState = workInProgress.memoizedState; // Caution: React DevTools currently depends on this property
@@ -11079,6 +11092,7 @@
     workInProgress.lanes = NoLanes;
 
     switch (workInProgress.tag) {
+      // Indeterminate: 不确定的
       case IndeterminateComponent:
         {
           return mountIndeterminateComponent(current, workInProgress, workInProgress.type, renderLanes);
@@ -14248,6 +14262,7 @@
   }
 
   function scheduleUpdateOnFiber(fiber, lane, eventTime) {
+    debugger;
     checkForNestedUpdates();
     warnAboutRenderPhaseUpdatesInDEV(fiber);
     var root = markUpdateLaneFromFiberToRoot(fiber, lane);
@@ -14967,6 +14982,7 @@
   }
 
   function renderRootSync(root, lanes) {
+    debugger;
     var prevExecutionContext = executionContext;
     executionContext |= RenderContext;
     var prevDispatcher = pushDispatcher(); // If the root or lanes have changed, throw out the existing stack
@@ -15110,11 +15126,12 @@
       next = beginWork$1(current, unitOfWork, subtreeRenderLanes);
       stopProfilerTimerIfRunningAndRecordDelta(unitOfWork, true);
     } else {
+      // 生成链表的下一个fiber节点
       next = beginWork$1(current, unitOfWork, subtreeRenderLanes);
     }
 
     resetCurrentFiber();
-    unitOfWork.memoizedProps = unitOfWork.pendingProps;
+    unitOfWork.memoizedProps = unitOfWork.pendingProps; // 如果next为null, 则表示当前work已经完成了，调用completeUnitOfWork
 
     if (next === null) {
       // If this doesn't spawn new work, complete the current work.
@@ -15127,8 +15144,9 @@
   }
 
   function completeUnitOfWork(unitOfWork) {
-    // Attempt to complete the current unit of work, then move to the next
+    debugger; // Attempt to complete the current unit of work, then move to the next
     // sibling. If there are no more siblings, return to the parent fiber.
+
     var completedWork = unitOfWork;
 
     do {
@@ -15258,6 +15276,7 @@
   }
 
   function commitRoot(root) {
+    debugger;
     var renderPriorityLevel = getCurrentPriorityLevel();
     runWithPriority(ImmediatePriority, commitRootImpl.bind(null, root, renderPriorityLevel));
     return null;
@@ -15578,6 +15597,8 @@
   }
 
   function commitBeforeMutationEffects() {
+    debugger;
+
     while (nextEffect !== null) {
       var current = nextEffect.alternate;
 
@@ -15620,6 +15641,8 @@
 
   function commitMutationEffects(root, renderPriorityLevel) {
     // TODO: Should probably move the bulk of this function to commitWork.
+    debugger;
+
     while (nextEffect !== null) {
       setCurrentFiber(nextEffect);
       var flags = nextEffect.flags;
@@ -15732,6 +15755,7 @@
   }
 
   function commitLayoutEffects(root, committedLanes) {
+    debugger;
 
     {
       markLayoutEffectsStarted(committedLanes);
@@ -16295,6 +16319,7 @@
       // error See ReactErrorUtils for more information.
       // Before entering the begin phase, copy the work-in-progress onto a dummy
       // fiber. If beginWork throws, we'll use this to reset the state.
+      // 复制一份fiber, 用于还原
       var originalWorkInProgressCopy = assignFiberPropertiesInDEV(dummyFiber, unitOfWork);
 
       try {
@@ -17645,11 +17670,16 @@
     return createFiberRoot(containerInfo, tag, hydrate);
   }
   function updateContainer(element, container, parentComponent, callback) {
+    debugger;
+
     {
       onScheduleRoot(container, element);
-    }
+    } // container 是FiberRootNode
+    // container.current 是一个FiberNode对象
 
-    var current = container.current;
+
+    var current = container.current; // 获取一个时间， 做什么用？
+
     var eventTime = requestEventTime();
 
     {
@@ -17657,13 +17687,15 @@
       if ('undefined' !== typeof jest) {
         warnIfUnmockedScheduler(current);
       }
-    }
+    } // 优先级
+
 
     var lane = requestUpdateLane(current);
 
     {
       markRenderScheduled(lane);
-    }
+    } // context是做什么用的？
+
 
     var context = getContextForSubtree(parentComponent);
 
@@ -17679,10 +17711,12 @@
 
         error('Render methods should be a pure function of props and state; ' + 'triggering nested component updates from render is not allowed. ' + 'If necessary, trigger nested updates in componentDidUpdate.\n\n' + 'Check the render method of %s.', getComponentName(current$1.type) || 'Unknown');
       }
-    }
+    } // 创建一个update对象
+
 
     var update = createUpdate(eventTime, lane); // Caution: React DevTools currently depends on this property
     // being called "element".
+    // element是 App组件
 
     update.payload = {
       element: element

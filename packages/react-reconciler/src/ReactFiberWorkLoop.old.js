@@ -533,6 +533,7 @@ export function scheduleUpdateOnFiber(
   lane: Lane,
   eventTime: number,
 ) {
+  debugger
   checkForNestedUpdates();
   warnAboutRenderPhaseUpdatesInDEV(fiber);
 
@@ -1160,7 +1161,9 @@ function flushPendingDiscreteUpdates() {
   flushSyncCallbackQueue();
 }
 
+// 导出为 unstable_batchedUpdates
 export function batchedUpdates<A, R>(fn: A => R, a: A): R {
+  debugger
   const prevExecutionContext = executionContext;
   executionContext |= BatchedContext;
   try {
@@ -1534,6 +1537,7 @@ export function renderHasNotSuspendedYet(): boolean {
 }
 
 function renderRootSync(root: FiberRoot, lanes: Lanes) {
+  debugger
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
   const prevDispatcher = pushDispatcher();
@@ -1698,11 +1702,13 @@ function performUnitOfWork(unitOfWork: Fiber): void {
     next = beginWork(current, unitOfWork, subtreeRenderLanes);
     stopProfilerTimerIfRunningAndRecordDelta(unitOfWork, true);
   } else {
+    // 生成链表的下一个fiber节点
     next = beginWork(current, unitOfWork, subtreeRenderLanes);
   }
 
   resetCurrentDebugFiberInDEV();
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
+  // 如果next为null, 则表示当前work已经完成了，调用completeUnitOfWork
   if (next === null) {
     // If this doesn't spawn new work, complete the current work.
     completeUnitOfWork(unitOfWork);
@@ -1714,6 +1720,7 @@ function performUnitOfWork(unitOfWork: Fiber): void {
 }
 
 function completeUnitOfWork(unitOfWork: Fiber): void {
+  debugger
   // Attempt to complete the current unit of work, then move to the next
   // sibling. If there are no more siblings, return to the parent fiber.
   let completedWork = unitOfWork;
@@ -1848,6 +1855,7 @@ function completeUnitOfWork(unitOfWork: Fiber): void {
 }
 
 function commitRoot(root) {
+  debugger
   const renderPriorityLevel = getCurrentPriorityLevel();
   runWithPriority(
     ImmediateSchedulerPriority,
@@ -2243,6 +2251,7 @@ function commitRootImpl(root, renderPriorityLevel) {
 }
 
 function commitBeforeMutationEffects() {
+  debugger
   while (nextEffect !== null) {
     const current = nextEffect.alternate;
 
@@ -2290,6 +2299,7 @@ function commitBeforeMutationEffects() {
 
 function commitMutationEffects(root: FiberRoot, renderPriorityLevel) {
   // TODO: Should probably move the bulk of this function to commitWork.
+  debugger
   while (nextEffect !== null) {
     setCurrentDebugFiberInDEV(nextEffect);
 
@@ -2397,6 +2407,7 @@ function commitMutationEffects(root: FiberRoot, renderPriorityLevel) {
 }
 
 function commitLayoutEffects(root: FiberRoot, committedLanes: Lanes) {
+  debugger
   if (__DEV__) {
     if (enableDebugTracing) {
       logLayoutEffectsStarted(committedLanes);
@@ -3182,6 +3193,7 @@ if (__DEV__ && replayFailedUnitOfWorkWithInvokeGuardedCallback) {
 
     // Before entering the begin phase, copy the work-in-progress onto a dummy
     // fiber. If beginWork throws, we'll use this to reset the state.
+    // 复制一份fiber, 用于还原
     const originalWorkInProgressCopy = assignFiberPropertiesInDEV(
       dummyFiber,
       unitOfWork,

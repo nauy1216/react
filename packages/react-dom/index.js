@@ -15,6 +15,7 @@ export {
   flushSync,
   __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED,
   version,
+  // 获取到dom节点，参数可以是dom元素或者vnode节点
   findDOMNode,
   hydrate,
   render,
